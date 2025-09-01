@@ -26,12 +26,13 @@ class UserController extends Controller
             'email' => ['required', 'email', Rule::unique('users', 'email')],
             'password' => ['required', 'min:8', 'max:255', 'confirmed']
         ]);
-        User::create([
+        $user = User::create([
             'username' => $incomingFields['username'],
             'email' => $incomingFields['email'],
             'password' => bcrypt($incomingFields['password'])
         ]);
-        return redirect('/');
+        Auth::login($user);
+        return redirect('/')->with('success', 'Your account has been created and you can now log in!');
     }
 
     function login(Request $request)
@@ -57,5 +58,11 @@ class UserController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/')->with('success', 'You have been logged out.');
+    }
+
+    public function profile($user)
+    {
+        $user = User::where('username', $user)->first();
+        return view('profile-post', ['username' => $user->username]);
     }
 }
