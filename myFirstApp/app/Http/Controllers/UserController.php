@@ -63,6 +63,6 @@ class UserController extends Controller
     public function profile($user)
     {
         $user = User::where('username', $user)->first();
-        return view('profile-post', ['username' => $user->username]);
+        return view('profile-post', ['username' => $user->username, 'posts' => $user->posts()->latest()->get(), 'postCount' => $user->posts()->count()]);
     }
 }
