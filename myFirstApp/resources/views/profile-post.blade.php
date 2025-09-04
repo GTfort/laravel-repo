@@ -5,6 +5,10 @@
         <form class="ml-2 d-inline" action="#" method="POST">
           <button class="btn btn-primary btn-sm">Follow <i class="fas fa-user-plus"></i></button>
           <!-- <button class="btn btn-danger btn-sm">Stop Following <i class="fas fa-user-times"></i></button> -->
+          @if(Auth::check() && Auth::user()->username == $username)
+            <a href="/manage-avatar" class="btn btn-primary btn-sm">Upload Avatar</a>
+          @endif
+         @csrf
         </form>
       </h2>
 

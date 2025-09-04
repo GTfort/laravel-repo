@@ -6,6 +6,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class UserController extends Controller
 {
@@ -64,5 +67,28 @@ class UserController extends Controller
     {
         $user = User::where('username', $user)->first();
         return view('profile-post', ['username' => $user->username, 'posts' => $user->posts()->latest()->get(), 'postCount' => $user->posts()->count()]);
+    }
+    public function showAvatarForm()
+    {
+        return view('manage-avatar');
+    }
+    public function storeAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|max:5000'
+        ]);
+        $uniqueFilename = Auth::user()->id . '-' . uniqid() . '.jpg';
+
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($request->file('avatar'));
+        $imageData = $image->cover(120, 120)->toJpeg();
+        Storage::disk('public')->put('avatars/' . $uniqueFilename, $imageData);
+
+        $user = Auth::user();
+        $user->avatar = $uniqueFilename;
+
+        // $user->save();
+        // return redirect('/profile/' . $user->username)->with('success', 'Avatar successfully updated.');
+        return 'Saved';
     }
 }
